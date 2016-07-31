@@ -749,6 +749,13 @@ Set <a>resource timing buffer full flag</a> to false.
 
 <p>For each resource <a title='fetch' href="https://fetch.spec.whatwg.org/#concept-fetch">fetched</a> by the current <a href="https://www.w3.org/TR/html5/browsers.html#browsing-context">browsing context</a>, excluding resources fetched by cross-origin stylesheets fetched with <code>no-cors</code> policy, perform the following steps:</p>
 
+  <p>
+    Failures may occur at any point in the processing model timeline of a fetched resource. <a href="https://www.w3.org/TR/network-error-logging/#report-type">Failure cases</a>
+    do not always directly correllate with HTTP response codes. For example, a fetch may be aborted by the user agent in the case of a redirect loop, resulting in a failed fetch.
+    If a <a href="https://www.w3.org/TR/network-error-logging/#report-type">failure case</a> occurs, include the PerformanceResourceTiming
+    object in the current Performance Timeline with initialized attribute values up to the point of failure.
+  </p>
+
   <p class="issue">
     Above cross-origin exclusion should be defined via Fetch registry: CSS needs to be defined in terms of Fetch and set some kind of "opaque request flag" for no-CORS CSS subresources. In turn, Resource Timing should interface with Fetch registry to surface resource fetch events.
   </p>
@@ -885,6 +892,11 @@ policy is enforced by default and certain attributes are set to zero, as describ
 explicitly allow all timing information to be collected for a resource by
 adding the <a href="#timing-allow-origin">Timing-Allow-Origin</a> HTTP response header, which specifies the
 domains that are allowed to access the timing information. </p>
+<p>If a failure occurs during a resource fetch under the same origin policy or through the contract of the Timing-Allow-Origin header,
+all timing information will be stored in the PerformanceResourceTiming object up to the point of failure.
+If the failure occurs during the fetch of a cross domain resource and the resource provider does not include the
+Timing-Allow-Origin header, then this resource will not be included as a PerformanceResourceTiming object in the Performance Timeline.
+</p>
 
 <p>
 Statistical fingerprinting is a privacy concern where a malicious web site may determine whether a user has visited a third-party web site by measuring the timing of cache hits and misses of resources in the third-party web site. Though the <a>PerformanceResourceTiming</a> interface gives timing information for resources in a document, the <a href="#cross-origin-resources">cross-origin restrictions</a> prevent making this privacy concern any worse than it is today using the load event on resources to measure timing to determine cache hits and misses.
